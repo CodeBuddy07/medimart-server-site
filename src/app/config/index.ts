@@ -22,7 +22,7 @@ export default {
   sslCommerze: {
     storeId: process.env.STORE_ID as string,
     storePassword: process.env.STORE_PASSWD as string,
-    isLive: process.env.IS_LIVE === "true", // Convert string to boolean
+    isLive: process.env.IS_LIVE === "true",
   },
   environment: process.env.NODE_ENV || 'development', 
 };
