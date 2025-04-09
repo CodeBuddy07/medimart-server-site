@@ -173,3 +173,18 @@ export const Update: RequestHandler = async (req: Request, res: Response, next: 
         next(error);
     }
 };
+
+// **🔹 Get All Users**
+export const GetAllUsers: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+        const allUsers = await userModel.find();
+        res.json({
+            success: true,
+            message: "Logged out successfully",
+            users: allUsers
+        });
+    } catch (error) {
+        next(error);
+    }
+};
