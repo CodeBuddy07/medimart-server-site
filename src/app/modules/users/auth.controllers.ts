@@ -3,9 +3,11 @@ import { AppError } from "../../utils/AppError";
 import { comparePassword, generateRefreshToken, generateToken, verifyRefreshToken } from "../../utils/authFunctions";
 import userModel from "./user.model";
 import { uploadImage } from "../../utils/cloudinary";
+import mongoose from "mongoose";
+import { CustomRequest } from "../../types";
 
 
-// **🔹 Login (For Both Admin & Customer)**
+
 export const login: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password } = req.body;
@@ -39,13 +41,12 @@ export const login: RequestHandler = async (req: Request, res: Response, next: N
 };
 
 
-// **🔹 Register User**
+
 export const register: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { name, email, password, phone, address } = req.body;
 
         await userModel.validate({ name, email, password, phone, address });
-
 
         const existingUser = await userModel.findOne({ email });
         if (existingUser) throw new AppError("Email already in use", 400);
@@ -96,7 +97,7 @@ export const register: RequestHandler = async (req: Request, res: Response, next
     }
 };
 
-// **🔹 Refresh Token**
+
 export const refreshToken: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { refreshToken } = req.cookies;
@@ -131,7 +132,7 @@ export const refreshToken: RequestHandler = async (req: Request, res: Response, 
     }
 };
 
-// **🔹 Logout**
+
 export const logout: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { refreshToken } = req.cookies;
@@ -152,7 +153,6 @@ export const logout: RequestHandler = async (req: Request, res: Response, next: 
     }
 };
 
-// **🔹 Logout**
 export const Update: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
@@ -174,15 +174,80 @@ export const Update: RequestHandler = async (req: Request, res: Response, next: 
     }
 };
 
-// **🔹 Get All Users**
+
 export const GetAllUsers: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        
+        const { search = '', page = 1, limit = 10 } = req.query;
+        
+        
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        
+        if (isNaN(pageNumber) || isNaN(limitNumber) || pageNumber < 1 || limitNumber < 1) {
+            throw new AppError("Invalid pagination parameters", 400);
+        }
 
-        const allUsers = await userModel.find();
-        res.json({
+       
+        let query: any = {};
+        
+       
+        if (search) {
+            query.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        
+        const total = await userModel.countDocuments(query);
+        
+        
+        const users = await userModel.find(query)
+            .select("-password -refreshToken -__v")
+            .skip((pageNumber - 1) * limitNumber)
+            .limit(limitNumber)
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
             success: true,
-            message: "Logged out successfully",
-            users: allUsers
+            message: "Users retrieved successfully",
+            data: {
+                users,
+                pagination: {
+                    total,
+                    page: pageNumber,
+                    limit: limitNumber,
+                    totalPages: Math.ceil(total / limitNumber)
+                }
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+export const GetMe: RequestHandler = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+        const  id  = req.user?.id;
+        
+
+        if (!mongoose.Types.ObjectId.isValid(id!)) {
+            throw new AppError("Invalid user ID format", 400);
+        }
+
+        const user = await userModel.findById(id)
+            .select("-password -refreshToken -__v -createdAt -updatedAt");
+        
+        if (!user) {
+            throw new AppError("User not found", 404);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "User retrieved successfully",
+            data: user 
         });
     } catch (error) {
         next(error);

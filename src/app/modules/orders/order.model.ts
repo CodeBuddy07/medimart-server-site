@@ -54,7 +54,7 @@ const OrderSchema: Schema = new Schema(
                       validator: async function (value: number) {
                           const medicine = await medicineModel.findById((this as any).medicine);
                           if (!medicine) return false;
-                          return value <= medicine.stock; // Ensure quantity does not exceed stock
+                          return value <= medicine.stock; 
                       },
                       message: "Quantity cannot exceed available stock",
                   },
@@ -107,7 +107,7 @@ const OrderSchema: Schema = new Schema(
 );
 
 
-// **📌 Pre-save hook to deduct stock before order is saved**
+
 OrderSchema.pre("save", async function (next) {
     try {
       for (const item of ((this as unknown) as IOrder & Document).items) {
@@ -115,7 +115,6 @@ OrderSchema.pre("save", async function (next) {
         if (!medicine) throw new Error(`Medicine not found: ${item.medicine}`);
         if (medicine.stock < item.quantity) throw new Error(`Not enough stock for ${medicine.name}`);
   
-        // Deduct stock
         medicine.stock -= item.quantity;
         await medicine.save();
       }
@@ -125,7 +124,7 @@ OrderSchema.pre("save", async function (next) {
     }
   });
   
-  // **📌 Post-save hook to send email after order is created**
+
   OrderSchema.post("save", async function (order) {
     try {
       const user = await userModel.findById(order.user);
@@ -141,7 +140,7 @@ OrderSchema.pre("save", async function (next) {
     }
   });
   
-  // **📌 Pre-update hook to restore stock if order is cancelled**
+
   OrderSchema.pre("findOneAndUpdate", async function (next) {
     try {
       const update = this.getUpdate();
@@ -152,7 +151,7 @@ OrderSchema.pre("save", async function (next) {
   
         for (const item of order.items) {
           await medicineModel.findByIdAndUpdate(item.medicine._id, {
-            $inc: { stock: item.quantity }, // Restore stock
+            $inc: { stock: item.quantity },
           });
         }
       }
@@ -162,7 +161,7 @@ OrderSchema.pre("save", async function (next) {
     }
   });
   
-  // **📌 Post-update hook to send email when status changes**
+ 
   OrderSchema.post("findOneAndUpdate", async function (order) {
     try {
       if (order) {

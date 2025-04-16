@@ -96,7 +96,7 @@ const UserSchema: Schema = new Schema(
     { timestamps: true }
 );
 
-// **🔑 Hash password before saving**
+
 UserSchema.pre<IUserModel>("save", async function (next) {
     if (!this.isModified("password")) return next();
     const salt = await bcrypt.genSalt(10);
@@ -104,7 +104,6 @@ UserSchema.pre<IUserModel>("save", async function (next) {
     next();
 });
 
-  // **📌 Pre-update hook to restore stock if order is cancelled**
   UserSchema.pre("findOneAndUpdate", async function (next) {
     try {
       const update = this.getUpdate();
@@ -117,7 +116,7 @@ UserSchema.pre<IUserModel>("save", async function (next) {
     }
   });
 
-// **🔑 Compare Passwords**
+
 UserSchema.methods.comparePassword = async function (
     enteredPassword: string
 ): Promise<boolean> {

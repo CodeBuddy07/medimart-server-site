@@ -66,12 +66,6 @@ const MedicineSchema: Schema = new Schema(
             contact: {
                 type: String,
                 required: [true, "Manufacturer contact is required"],
-                validate: {
-                    validator: function (v: string) {
-                        return /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/g.test(v);
-                    },
-                    message: "Invalid contact number format",
-                },
             },
         },
         symptoms: {
@@ -87,21 +81,6 @@ const MedicineSchema: Schema = new Schema(
         category: {
             type: String,
             required: [true, "Category is required"],
-            enum: {
-                values: [
-                    "Antibiotic",
-                    "Painkiller",
-                    "Antipyretic",
-                    "Antiviral",
-                    "Antidepressant",
-                    "Antifungal",
-                    "Cardiovascular",
-                    "Diabetes",
-                    "Respiratory",
-                    "Other",
-                ],
-                message: "Invalid category",
-            },
         },
         images: {
             type: [

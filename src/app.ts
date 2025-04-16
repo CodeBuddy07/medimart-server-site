@@ -10,11 +10,10 @@ import orderRouter from './app/modules/orders/order.routes';
 const app: Application = express();
 
 //parsers
-app.use(cookieParser()); // 🟢 Enables reading & writing cookies
+app.use(cookieParser()); 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Handles form-urlencoded
-app.use(cors({ origin: ['http://localhost:5173'] }));
-
+app.use(express.urlencoded({ extended: true })); 
+app.use(cors({ origin: ['http://localhost:3000'], credentials: true })); 
 
 
 //Application Routes

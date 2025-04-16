@@ -6,7 +6,7 @@ import { CustomRequest } from "../../types";
 import medicineModel, { IMedicine } from "../medicines/medicine.model";
 
 
-// ✅ Create a new order
+
 export const createOrder = async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
         const { items, paymentMethod, deliveryAddress } = req.body;
@@ -68,7 +68,6 @@ export const createOrder = async (req: CustomRequest, res: Response, next: NextF
 };
 
 
-// ✅ Get all orders (Admin)
 export const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const orders = await orderModel.find().populate("user items.medicine");
@@ -78,7 +77,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
-// ✅ Get a single order by ID
+
 export const getOrderById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const order = await orderModel.findById(req.params.id).populate("user items.medicine");
@@ -91,7 +90,6 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
-// ✅ Update order status
 export const updateOrderStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { status, paymentStatus } = req.body;
@@ -109,7 +107,7 @@ export const updateOrderStatus = async (req: Request, res: Response, next: NextF
     }
 };
 
-// ✅ Remove an order
+
 export const removeOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const order = await orderModel.findById(req.params.id);
@@ -129,11 +127,26 @@ export const removeOrder = async (req: Request, res: Response, next: NextFunctio
 };
 
 
-// ✅ Get user-specific orders
+
 export const getUserOrders = async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
 
         const orders = await orderModel.find({ user: req.user?.id }).populate("items.medicine");
+
+        if (!orders.length) throw new AppError("No orders found for this user", 404);
+
+        res.status(200).json({ success: true, data: orders });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getUserOrdersById = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+
+        const { id } = req.params;
+
+        const orders = await orderModel.find({ id }).populate("items.medicine");
 
         if (!orders.length) throw new AppError("No orders found for this user", 404);
 
