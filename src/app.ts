@@ -13,7 +13,7 @@ const app: Application = express();
 app.use(cookieParser()); 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
-app.use(cors({ origin: ['http://localhost:3000'], credentials: true })); 
+app.use(cors({ origin: ['http://localhost:3000', 'https://medimart-client-site.vercel.app'], credentials: true })); 
 
 
 //Application Routes

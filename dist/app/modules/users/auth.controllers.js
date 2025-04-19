@@ -32,11 +32,16 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         const accessToken = (0, authFunctions_1.generateToken)({ id: user._id, role: user.role, email: user.email });
         user.refreshToken = refreshToken;
         yield user.save();
-        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: config_1.default.environment === 'production',
+            sameSite: 'none',
+            path: '/'
+        });
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: config_1.default.environment === 'production',
-            sameSite: 'strict',
+            sameSite: 'none',
             path: '/'
         });
         res.json({
@@ -75,11 +80,16 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         const refreshToken = (0, authFunctions_1.generateRefreshToken)({ id: newUser._id, role: newUser.role, email: newUser.email });
         newUser.refreshToken = refreshToken;
         yield newUser.save();
-        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: config_1.default.environment === 'production',
+            sameSite: 'none',
+            path: '/'
+        });
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: config_1.default.environment === 'production',
-            sameSite: 'strict',
+            sameSite: 'none',
             path: '/'
         });
         res.status(201).json({
@@ -117,11 +127,16 @@ const refreshToken = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const newRefreshToken = (0, authFunctions_1.generateRefreshToken)({ id: user._id, role: user.role, email: user.email });
         user.refreshToken = newRefreshToken;
         yield user.save();
-        res.cookie("refreshToken", newRefreshToken, { httpOnly: true, secure: true });
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true,
+            secure: config_1.default.environment === 'production',
+            sameSite: 'none',
+            path: '/'
+        });
         res.cookie("accessToken", newAccessToken, {
             httpOnly: true,
             secure: config_1.default.environment === 'production',
-            sameSite: 'strict',
+            sameSite: 'none',
             path: '/'
         });
         res.json({

@@ -28,11 +28,16 @@ export const login: RequestHandler = async (req: Request, res: Response, next: N
         await user.save();
 
 
-        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true, 
+            secure: config.environment === 'production',
+            sameSite: 'none',
+            path: '/'
+        });
         res.cookie("accessToken", accessToken, {
             httpOnly: true, 
             secure: config.environment === 'production',
-            sameSite: 'strict',
+            sameSite: 'none',
             path: '/'
         });
         res.json({
@@ -82,11 +87,16 @@ export const register: RequestHandler = async (req: Request, res: Response, next
         newUser.refreshToken = refreshToken;
         await newUser.save();
 
-        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true, 
+            secure: config.environment === 'production',
+            sameSite: 'none',
+            path: '/'
+        });
         res.cookie("accessToken", accessToken, {
             httpOnly: true, 
             secure: config.environment === 'production',
-            sameSite: 'strict',
+            sameSite: 'none',
             path: '/'
         });
         res.status(201).json({
@@ -130,11 +140,16 @@ export const refreshToken: RequestHandler = async (req: Request, res: Response, 
         await user.save();
 
 
-        res.cookie("refreshToken", newRefreshToken, { httpOnly: true, secure: true });
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true, 
+            secure: config.environment === 'production',
+            sameSite: 'none',
+            path: '/'
+        });
         res.cookie("accessToken", newAccessToken, {
             httpOnly: true, 
             secure: config.environment === 'production',
-            sameSite: 'strict',
+            sameSite: 'none',
             path: '/'
         });
         res.json({
