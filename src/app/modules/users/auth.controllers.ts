@@ -136,7 +136,7 @@ export const refreshToken: RequestHandler = async (req: Request, res: Response, 
 export const logout: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { refreshToken } = req.cookies;
-        if (!refreshToken) throw new AppError("No refresh token provided", 401);
+        // if (!refreshToken) throw new AppError("No refresh token provided", 401);
 
 
         await userModel.findOneAndUpdate({ refreshToken }, { refreshToken: null });

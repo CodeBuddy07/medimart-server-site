@@ -16,7 +16,6 @@ export const addMedicine = async (req: Request, res: Response, next: NextFunctio
     try {
         const { name, description, price, stock, requiredPrescription, manufacturer, symptoms, category } = req.body;
 
-        console.log(JSON.parse(manufacturer).name);
 
         if (!req.files || !Array.isArray(req.files)) {
             throw new AppError("At least one image must be uploaded", 400);
@@ -146,7 +145,7 @@ export const getMedicineById = async (req: Request, res: Response, next: NextFun
 export const updateMedicine = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        console.log(req.body);
+
         const medicine = await medicineModel.findById(req.params.id);
         if (!medicine) throw new AppError("Medicine not found", 404);
 

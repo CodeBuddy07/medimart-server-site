@@ -24,5 +24,7 @@ export default {
     storePassword: process.env.STORE_PASSWD as string,
     isLive: process.env.IS_LIVE === "true",
   },
-  environment: process.env.NODE_ENV || 'development', 
+  environment: process.env.NODE_ENV || 'development',
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  backendUrl: process.env.BACKEND_URL || 'http://localhost:5000',
 };

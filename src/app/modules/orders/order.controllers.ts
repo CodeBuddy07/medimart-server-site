@@ -3,69 +3,7 @@ import { AppError } from "../../utils/AppError";
 import { deleteImage, uploadImage } from "../../utils/cloudinary";
 import orderModel from "./order.model";
 import { CustomRequest } from "../../types";
-import medicineModel, { IMedicine } from "../medicines/medicine.model";
 
-
-
-export const createOrder = async (req: CustomRequest, res: Response, next: NextFunction) => {
-    try {
-        const { items, paymentMethod, deliveryAddress } = req.body;
-        const user = req.user?.id;
-
-        console.log(req.user);
-
-        if (!items || items.length === 0) {
-            throw new AppError("Order must contain at least one item", 400);
-        }
-
-        const medicineIds = items.map((item: { medicine: string }) => item.medicine);
-        const medicines = await medicineModel.find({ _id: { $in: medicineIds } });
-
-        if (medicines.length !== items.length) {
-            throw new AppError("One or more medicines are not found", 400);
-        }
-
-        let totalPrice = 0;
-        const validatedItems = items.map((item: { medicine: string; quantity: number }) => {
-            const medicine = medicines.find((m:any) => m._id.toString() === item.medicine);
-            if (!medicine) throw new AppError(`Medicine with ID ${item.medicine} not found`, 400);
-
-            const itemTotal = medicine.price * item.quantity;
-            totalPrice += itemTotal;
-
-            return {
-                medicine: item.medicine,
-                quantity: item.quantity,
-                price: medicine.price,
-                itemTotal
-            };
-        });
-
-        await orderModel.validate({user, items, totalPrice, paymentMethod, deliveryAddress})
-
-        let prescription = null;
-        if (req.file) {
-            prescription = await uploadImage(req.file);
-        }
-
-        const order = await orderModel.create({
-            user,
-            items: validatedItems,
-            totalPrice,
-            paymentMethod,
-            deliveryAddress,
-            prescription,
-        });
-
-        res.status(201).json({
-            success: true,
-            message: "Order created successfully",
-            data: order,
-        });
-    } catch (error) {
-        next(error);
-    }
-};
 
 
 export const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
