@@ -77,7 +77,6 @@ export const getAllMedicines = async (req: Request, res: Response, next: NextFun
         const { page, limit, skip } = getPaginationOptions(req);
         const { search, category, minPrice, maxPrice, requiredPrescription } = req.query;
 
-        
         const query: any = {};
 
         if (search) {
@@ -88,8 +87,8 @@ export const getAllMedicines = async (req: Request, res: Response, next: NextFun
             ];
         }
 
-        if (category) {
-            query.category = category;
+        if (category && category !== 'all') {
+            query.$or = [ { category: { $regex: category.toString().replace("-"," ") as string, $options: 'i' } }]
         }
 
         if (minPrice || maxPrice) {
