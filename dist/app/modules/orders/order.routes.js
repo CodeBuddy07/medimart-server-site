@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const multer_1 = __importDefault(require("../../utils/multer"));
+const order_controllers_1 = require("./order.controllers");
+const verifyUser_1 = __importDefault(require("../../middlewares/verifyUser"));
+const verifyAdmin_1 = require("../../middlewares/verifyAdmin");
+const payment_controller_1 = require("../payment/payment.controller");
+const orderRouter = express_1.default.Router();
+orderRouter.get("/", verifyAdmin_1.verifyAdmin, order_controllers_1.getAllOrders);
+orderRouter.get("/user", verifyUser_1.default, order_controllers_1.getUserOrders);
+orderRouter.get("/user/:id", verifyUser_1.default, verifyAdmin_1.verifyAdmin, order_controllers_1.getUserOrdersById);
+orderRouter.get("/:id", verifyAdmin_1.verifyAdmin, order_controllers_1.getOrderById);
+orderRouter.put("/:id", verifyAdmin_1.verifyAdmin, order_controllers_1.updateOrderStatus);
+orderRouter.delete("/:id", verifyAdmin_1.verifyAdmin, order_controllers_1.removeOrder);
+orderRouter.post('/initiate', verifyUser_1.default, multer_1.default.single("prescription"), payment_controller_1.createOrderAndInitiatePayment);
+orderRouter.get('/validate/:tran_id', payment_controller_1.validatePayment);
+orderRouter.post('/ipn', payment_controller_1.paymentIPN);
+exports.default = orderRouter;
