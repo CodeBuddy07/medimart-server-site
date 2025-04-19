@@ -18,6 +18,7 @@ const authFunctions_1 = require("../../utils/authFunctions");
 const user_model_1 = __importDefault(require("./user.model"));
 const cloudinary_1 = require("../../utils/cloudinary");
 const mongoose_1 = __importDefault(require("mongoose"));
+const config_1 = __importDefault(require("../../config"));
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
@@ -32,7 +33,12 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         user.refreshToken = refreshToken;
         yield user.save();
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
-        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true });
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: config_1.default.environment === 'production',
+            sameSite: 'strict',
+            path: '/'
+        });
         res.json({
             success: true,
             message: "User Logged in Successfully!",
@@ -70,7 +76,12 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         newUser.refreshToken = refreshToken;
         yield newUser.save();
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
-        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true });
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: config_1.default.environment === 'production',
+            sameSite: 'strict',
+            path: '/'
+        });
         res.status(201).json({
             success: true,
             message: "User registered successfully!",
@@ -107,7 +118,12 @@ const refreshToken = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         user.refreshToken = newRefreshToken;
         yield user.save();
         res.cookie("refreshToken", newRefreshToken, { httpOnly: true, secure: true });
-        res.cookie("accessToken", newAccessToken, { httpOnly: true, secure: true });
+        res.cookie("accessToken", newAccessToken, {
+            httpOnly: true,
+            secure: config_1.default.environment === 'production',
+            sameSite: 'strict',
+            path: '/'
+        });
         res.json({
             success: true,
             message: "Token refreshed successfully",
@@ -199,6 +215,7 @@ const GetMe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     var _a;
     try {
         const id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        console.log("user id in get me: ", req.user);
         if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
             throw new AppError_1.AppError("Invalid user ID format", 400);
         }

@@ -5,6 +5,7 @@ import userModel from "./user.model";
 import { uploadImage } from "../../utils/cloudinary";
 import mongoose from "mongoose";
 import { CustomRequest } from "../../types";
+import config from "../../config";
 
 
 
@@ -19,8 +20,8 @@ export const login: RequestHandler = async (req: Request, res: Response, next: N
         if (!isMatch) throw new AppError("Invalid email or password", 401);
 
 
-        const refreshToken = generateRefreshToken({ id: user._id, role: user.role, email:  user.email });
-        const accessToken = generateToken({ id: user._id, role: user.role, email:  user.email });
+        const refreshToken = generateRefreshToken({ id: user._id, role: user.role, email: user.email });
+        const accessToken = generateToken({ id: user._id, role: user.role, email: user.email });
 
 
         user.refreshToken = refreshToken;
@@ -28,11 +29,16 @@ export const login: RequestHandler = async (req: Request, res: Response, next: N
 
 
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
-        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true });
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true, 
+            secure: config.environment === 'production',
+            sameSite: 'strict',
+            path: '/'
+        });
         res.json({
             success: true,
             message: "User Logged in Successfully!",
-            accessToken, 
+            accessToken,
             role: user.role
         });
     } catch (error) {
@@ -55,14 +61,14 @@ export const register: RequestHandler = async (req: Request, res: Response, next
             new AppError('No image uploaded', 400);
         }
 
-        const profileImage = await uploadImage( req.file!);
+        const profileImage = await uploadImage(req.file!);
 
 
         const newUser = await userModel.create({
             name,
             email,
             password,
-            role: "customer", 
+            role: "customer",
             profileImage,
             phone,
             address,
@@ -77,7 +83,12 @@ export const register: RequestHandler = async (req: Request, res: Response, next
         await newUser.save();
 
         res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
-        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true });
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true, 
+            secure: config.environment === 'production',
+            sameSite: 'strict',
+            path: '/'
+        });
         res.status(201).json({
             success: true,
             message: "User registered successfully!",
@@ -111,8 +122,8 @@ export const refreshToken: RequestHandler = async (req: Request, res: Response, 
         if (!decoded) throw new AppError("Invalid refresh token", 403);
 
 
-        const newAccessToken = generateToken({ id: user._id, role: user.role, email:  user.email });
-        const newRefreshToken = generateRefreshToken({ id: user._id, role: user.role, email:  user.email });
+        const newAccessToken = generateToken({ id: user._id, role: user.role, email: user.email });
+        const newRefreshToken = generateRefreshToken({ id: user._id, role: user.role, email: user.email });
 
 
         user.refreshToken = newRefreshToken;
@@ -120,8 +131,13 @@ export const refreshToken: RequestHandler = async (req: Request, res: Response, 
 
 
         res.cookie("refreshToken", newRefreshToken, { httpOnly: true, secure: true });
-        res.cookie("accessToken", newAccessToken, { httpOnly: true, secure: true });
-        res.json({ 
+        res.cookie("accessToken", newAccessToken, {
+            httpOnly: true, 
+            secure: config.environment === 'production',
+            sameSite: 'strict',
+            path: '/'
+        });
+        res.json({
             success: true,
             message: "Token refreshed successfully",
             accessToken: newAccessToken,
@@ -177,21 +193,21 @@ export const Update: RequestHandler = async (req: Request, res: Response, next: 
 
 export const GetAllUsers: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        
+
         const { search = '', page = 1, limit = 10 } = req.query;
-        
-        
+
+
         const pageNumber = Number(page);
         const limitNumber = Number(limit);
-        
+
         if (isNaN(pageNumber) || isNaN(limitNumber) || pageNumber < 1 || limitNumber < 1) {
             throw new AppError("Invalid pagination parameters", 400);
         }
 
-       
+
         let query: any = {};
-        
-       
+
+
         if (search) {
             query.$or = [
                 { name: { $regex: search, $options: 'i' } },
@@ -199,10 +215,10 @@ export const GetAllUsers: RequestHandler = async (req: Request, res: Response, n
             ];
         }
 
-        
+
         const total = await userModel.countDocuments(query);
-        
-        
+
+
         const users = await userModel.find(query)
             .select("-password -refreshToken -__v")
             .skip((pageNumber - 1) * limitNumber)
@@ -230,8 +246,9 @@ export const GetAllUsers: RequestHandler = async (req: Request, res: Response, n
 
 export const GetMe: RequestHandler = async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
-        const  id  = req.user?.id;
-        
+        const id = req.user?.id;
+
+        console.log("user id in get me: ", req.user);
 
         if (!mongoose.Types.ObjectId.isValid(id!)) {
             throw new AppError("Invalid user ID format", 400);
@@ -239,7 +256,7 @@ export const GetMe: RequestHandler = async (req: CustomRequest, res: Response, n
 
         const user = await userModel.findById(id)
             .select("-password -refreshToken -__v -createdAt -updatedAt");
-        
+
         if (!user) {
             throw new AppError("User not found", 404);
         }
@@ -247,7 +264,7 @@ export const GetMe: RequestHandler = async (req: CustomRequest, res: Response, n
         res.status(200).json({
             success: true,
             message: "User retrieved successfully",
-            data: user 
+            data: user
         });
     } catch (error) {
         next(error);

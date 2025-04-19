@@ -6,6 +6,7 @@ import { verifyToken } from "../utils/authFunctions";
 const verifyUser: RequestHandler = (req: CustomRequest, res: Response, next: NextFunction) => {
 
   const token = req.cookies.accessToken;
+  console.log("Token:", token);
   if (!token) throw new AppError("Access Denied", 401);
    
   try {
