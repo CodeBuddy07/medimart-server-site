@@ -12,13 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetMe = exports.GetAllUsers = exports.Update = exports.logout = exports.refreshToken = exports.register = exports.login = void 0;
+exports.GetMe = exports.GetAllUsers = exports.Update = exports.refreshToken = exports.register = exports.login = void 0;
 const AppError_1 = require("../../utils/AppError");
 const authFunctions_1 = require("../../utils/authFunctions");
 const user_model_1 = __importDefault(require("./user.model"));
 const cloudinary_1 = require("../../utils/cloudinary");
 const mongoose_1 = __importDefault(require("mongoose"));
-const config_1 = __importDefault(require("../../config"));
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
@@ -32,22 +31,11 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         const accessToken = (0, authFunctions_1.generateToken)({ id: user._id, role: user.role, email: user.email });
         user.refreshToken = refreshToken;
         yield user.save();
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: config_1.default.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            secure: config_1.default.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
         res.json({
             success: true,
             message: "User Logged in Successfully!",
             accessToken,
+            refreshToken,
             role: user.role
         });
     }
@@ -80,22 +68,11 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         const refreshToken = (0, authFunctions_1.generateRefreshToken)({ id: newUser._id, role: newUser.role, email: newUser.email });
         newUser.refreshToken = refreshToken;
         yield newUser.save();
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: config_1.default.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            secure: config_1.default.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
         res.status(201).json({
             success: true,
             message: "User registered successfully!",
             accessToken,
+            refreshToken,
             user: {
                 id: newUser._id,
                 name: newUser.name,
@@ -127,22 +104,11 @@ const refreshToken = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const newRefreshToken = (0, authFunctions_1.generateRefreshToken)({ id: user._id, role: user.role, email: user.email });
         user.refreshToken = newRefreshToken;
         yield user.save();
-        res.cookie("refreshToken", newRefreshToken, {
-            httpOnly: true,
-            secure: config_1.default.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
-        res.cookie("accessToken", newAccessToken, {
-            httpOnly: true,
-            secure: config_1.default.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
         res.json({
             success: true,
             message: "Token refreshed successfully",
             accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
         });
     }
     catch (error) {
@@ -150,23 +116,21 @@ const refreshToken = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.refreshToken = refreshToken;
-const logout = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { refreshToken } = req.cookies;
-        // if (!refreshToken) throw new AppError("No refresh token provided", 401);
-        yield user_model_1.default.findOneAndUpdate({ refreshToken }, { refreshToken: null });
-        res.clearCookie("refreshToken");
-        res.clearCookie("accessToken");
-        res.json({
-            success: true,
-            message: "Logged out successfully"
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.logout = logout;
+// export const logout: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         const { refreshToken } = req.cookies;
+//         // if (!refreshToken) throw new AppError("No refresh token provided", 401);
+//         await userModel.findOneAndUpdate({ refreshToken }, { refreshToken: null });
+//         res.clearCookie("refreshToken");
+//         res.clearCookie("accessToken");
+//         res.json({
+//             success: true,
+//             message: "Logged out successfully"
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 const Update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { updatedDoc } = req.body;
@@ -174,10 +138,9 @@ const Update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         if (!id || !updatedDoc)
             throw new AppError_1.AppError("Missing Information.", 404);
         const updatedUser = yield user_model_1.default.findByIdAndUpdate(id, updatedDoc, { new: true });
-        res.clearCookie("accessToken");
         res.json({
             success: true,
-            message: "Logged out successfully",
+            message: "user updated successfully",
             user: updatedUser
         });
     }

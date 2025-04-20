@@ -27,23 +27,12 @@ export const login: RequestHandler = async (req: Request, res: Response, next: N
         user.refreshToken = refreshToken;
         await user.save();
 
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true, 
-            secure: config.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true, 
-            secure: config.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
+        
         res.json({
             success: true,
             message: "User Logged in Successfully!",
             accessToken,
+            refreshToken,
             role: user.role
         });
     } catch (error) {
@@ -87,22 +76,13 @@ export const register: RequestHandler = async (req: Request, res: Response, next
         newUser.refreshToken = refreshToken;
         await newUser.save();
 
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true, 
-            secure: config.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true, 
-            secure: config.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
+        
+
         res.status(201).json({
             success: true,
             message: "User registered successfully!",
             accessToken,
+            refreshToken,
             user: {
                 id: newUser._id,
                 name: newUser.name,
@@ -140,22 +120,12 @@ export const refreshToken: RequestHandler = async (req: Request, res: Response, 
         await user.save();
 
 
-        res.cookie("refreshToken", newRefreshToken, {
-            httpOnly: true, 
-            secure: config.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
-        res.cookie("accessToken", newAccessToken, {
-            httpOnly: true, 
-            secure: config.environment === 'production',
-            sameSite: 'none',
-            path: '/'
-        });
+        
         res.json({
             success: true,
             message: "Token refreshed successfully",
             accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
         });
 
     } catch (error) {
@@ -164,25 +134,25 @@ export const refreshToken: RequestHandler = async (req: Request, res: Response, 
 };
 
 
-export const logout: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { refreshToken } = req.cookies;
-        // if (!refreshToken) throw new AppError("No refresh token provided", 401);
+// export const logout: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         const { refreshToken } = req.cookies;
+//         // if (!refreshToken) throw new AppError("No refresh token provided", 401);
 
 
-        await userModel.findOneAndUpdate({ refreshToken }, { refreshToken: null });
+//         await userModel.findOneAndUpdate({ refreshToken }, { refreshToken: null });
 
 
-        res.clearCookie("refreshToken");
-        res.clearCookie("accessToken");
-        res.json({
-            success: true,
-            message: "Logged out successfully"
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+//         res.clearCookie("refreshToken");
+//         res.clearCookie("accessToken");
+//         res.json({
+//             success: true,
+//             message: "Logged out successfully"
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 export const Update: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -194,10 +164,9 @@ export const Update: RequestHandler = async (req: Request, res: Response, next: 
 
         const updatedUser = await userModel.findByIdAndUpdate(id, updatedDoc, { new: true });
 
-        res.clearCookie("accessToken");
         res.json({
             success: true,
-            message: "Logged out successfully",
+            message: "user updated successfully",
             user: updatedUser
         });
     } catch (error) {

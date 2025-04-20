@@ -4,21 +4,23 @@ import { AppError } from "../utils/AppError";
 import { verifyToken } from "../utils/authFunctions";
 
 const verifyUser: RequestHandler = (req: CustomRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
 
-  const token = req.cookies.accessToken;
-  console.log("Token:", token);
-  if (!token) throw new AppError("Access Denied", 401);
-   
+  console.log("Authorization Header:", authHeader);
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw new AppError("Access Denied: No token provided", 401);
+  }
+
+  const token = authHeader.split(" ")[1];
+
   try {
     const decoded: any = verifyToken(token);
     req.user = decoded;
     next();
   } catch (error) {
     next(error);
-
   }
 };
 
 export default verifyUser;
-
-

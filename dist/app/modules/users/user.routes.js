@@ -11,7 +11,6 @@ const verifyUser_1 = __importDefault(require("../../middlewares/verifyUser"));
 const userRoutes = express_1.default.Router();
 userRoutes.post("/login", auth_controllers_1.login);
 userRoutes.post("/refresh", auth_controllers_1.refreshToken);
-userRoutes.post("/logout", auth_controllers_1.logout);
 userRoutes.post("/register", multer_1.default.single("Image"), auth_controllers_1.register);
 userRoutes.post("/update/:id", verifyUser_1.default, verifyAdmin_1.verifyAdmin, auth_controllers_1.Update);
 userRoutes.get("/me", verifyUser_1.default, auth_controllers_1.GetMe);
