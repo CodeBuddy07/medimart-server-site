@@ -6,8 +6,6 @@ import { verifyToken } from "../utils/authFunctions";
 const verifyUser: RequestHandler = (req: CustomRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
-  console.log("Authorization Header:", authHeader);
-
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw new AppError("Access Denied: No token provided", 401);
   }

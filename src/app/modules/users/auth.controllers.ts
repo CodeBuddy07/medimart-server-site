@@ -157,12 +157,14 @@ export const refreshToken: RequestHandler = async (req: Request, res: Response, 
 export const Update: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const { updatedDoc } = req.body;
+        const  data  = req.body;
         const { id } = req.params;
 
-        if (!id || !updatedDoc) throw new AppError("Missing Information.", 404);
+        console.log();
 
-        const updatedUser = await userModel.findByIdAndUpdate(id, updatedDoc, { new: true });
+        if (!id || !data) throw new AppError("Missing Information.", 404);
+
+        const updatedUser = await userModel.findByIdAndUpdate(id, data, { new: true });
 
         res.json({
             success: true,
@@ -231,8 +233,6 @@ export const GetAllUsers: RequestHandler = async (req: Request, res: Response, n
 export const GetMe: RequestHandler = async (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
         const id = req.user?.id;
-
-        console.log("user id in get me: ", req.user);
 
         if (!mongoose.Types.ObjectId.isValid(id!)) {
             throw new AppError("Invalid user ID format", 400);

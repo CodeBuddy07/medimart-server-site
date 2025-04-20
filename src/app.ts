@@ -5,6 +5,7 @@ import userRoutes from './app/modules/users/user.routes';
 import cookieParser from "cookie-parser";
 import medicineRouter from './app/modules/medicines/medicine.routes';
 import orderRouter from './app/modules/orders/order.routes';
+import statisticsRouter from './app/modules/statistics/statictics.route';
 
 
 const app: Application = express();
@@ -20,6 +21,7 @@ app.use(cors({ origin: ['http://localhost:3000', 'https://medimart-client-site.v
 app.use('/api', userRoutes);
 app.use('/api/medicine', medicineRouter);
 app.use('/api/order', orderRouter);
+app.use('/api/statistics', statisticsRouter);
 
 
 app.get('/', (req: Request, res: Response) => {

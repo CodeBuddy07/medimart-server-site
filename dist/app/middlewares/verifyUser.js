@@ -4,7 +4,6 @@ const AppError_1 = require("../utils/AppError");
 const authFunctions_1 = require("../utils/authFunctions");
 const verifyUser = (req, res, next) => {
     const authHeader = req.headers.authorization;
-    console.log("Authorization Header:", authHeader);
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         throw new AppError_1.AppError("Access Denied: No token provided", 401);
     }

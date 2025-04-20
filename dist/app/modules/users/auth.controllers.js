@@ -133,11 +133,12 @@ exports.refreshToken = refreshToken;
 // };
 const Update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { updatedDoc } = req.body;
+        const data = req.body;
         const { id } = req.params;
-        if (!id || !updatedDoc)
+        console.log();
+        if (!id || !data)
             throw new AppError_1.AppError("Missing Information.", 404);
-        const updatedUser = yield user_model_1.default.findByIdAndUpdate(id, updatedDoc, { new: true });
+        const updatedUser = yield user_model_1.default.findByIdAndUpdate(id, data, { new: true });
         res.json({
             success: true,
             message: "user updated successfully",
@@ -193,7 +194,6 @@ const GetMe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     var _a;
     try {
         const id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-        console.log("user id in get me: ", req.user);
         if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
             throw new AppError_1.AppError("Invalid user ID format", 400);
         }

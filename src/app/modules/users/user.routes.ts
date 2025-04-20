@@ -11,7 +11,7 @@ const userRoutes = express.Router();
 userRoutes.post("/login", login);
 userRoutes.post("/refresh", refreshToken);
 userRoutes.post("/register", upload.single("Image"), register);
-userRoutes.post("/update/:id", verifyUser, verifyAdmin, Update);
+userRoutes.post("/update/:id", verifyUser, Update);
 userRoutes.get("/me", verifyUser, GetMe);
 userRoutes.get("/", verifyUser, verifyAdmin, GetAllUsers);
 
