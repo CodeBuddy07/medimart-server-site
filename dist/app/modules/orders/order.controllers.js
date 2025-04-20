@@ -87,7 +87,8 @@ exports.getUserOrders = getUserOrders;
 const getUserOrdersById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const orders = yield order_model_1.default.find({ id }).populate("items.medicine");
+        const orders = yield order_model_1.default.find({ user: id }).populate("items.medicine");
+        console.log(orders);
         if (!orders.length)
             throw new AppError_1.AppError("No orders found for this user", 404);
         res.status(200).json({ success: true, data: orders });

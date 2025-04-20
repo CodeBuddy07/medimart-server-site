@@ -84,7 +84,9 @@ export const getUserOrdersById = async (req: CustomRequest, res: Response, next:
 
         const { id } = req.params;
 
-        const orders = await orderModel.find({ id }).populate("items.medicine");
+        const orders = await orderModel.find({ user: id }).populate("items.medicine");
+
+        console.log(orders);
 
         if (!orders.length) throw new AppError("No orders found for this user", 404);
 
