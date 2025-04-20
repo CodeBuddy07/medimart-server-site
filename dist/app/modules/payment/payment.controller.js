@@ -37,9 +37,9 @@ const initiateSSLCommerzPayment = (orderData) => __awaiter(void 0, void 0, void 
             total_amount: orderData.totalPrice,
             currency: 'BDT',
             tran_id,
-            success_url: `${config_1.default.frontendUrl}/payment/success`,
-            fail_url: `${config_1.default.frontendUrl}/payment/failed`,
-            cancel_url: `${config_1.default.frontendUrl}/payment/failed`,
+            success_url: `${config_1.default.frontendUrl}/api/payment/success`,
+            fail_url: `${config_1.default.frontendUrl}/api/payment/failed`,
+            cancel_url: `${config_1.default.frontendUrl}/api/payment/failed`,
             ipn_url: `${config_1.default.backendUrl}/api/order/ipn`,
             shipping_method: 'Courier',
             product_name: 'Medicines',
@@ -206,6 +206,7 @@ const paymentIPN = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const storeId = req.body.store_id;
         const storePass = req.body.store_passwd;
         if (storeId !== config_1.default.sslCommerze.storeId || storePass !== config_1.default.sslCommerze.storePassword) {
+            console.log("Unauthorized IPN request");
             res.status(401).json({ error: "Unauthorized IPN request" });
             return;
         }

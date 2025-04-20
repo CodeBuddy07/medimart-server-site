@@ -39,9 +39,9 @@ export const initiateSSLCommerzPayment = async (orderData: any) => {
             total_amount: orderData.totalPrice,
             currency: 'BDT',
             tran_id,
-            success_url: `${config.frontendUrl}/payment/success`,
-            fail_url: `${config.frontendUrl}/payment/failed`,
-            cancel_url: `${config.frontendUrl}/payment/failed`,
+            success_url: `${config.frontendUrl}/api/payment/success`,
+            fail_url: `${config.frontendUrl}/api/payment/failed`,
+            cancel_url: `${config.frontendUrl}/api/payment/failed`,
             ipn_url: `${config.backendUrl}/api/order/ipn`,
             shipping_method: 'Courier',
             product_name: 'Medicines',
@@ -242,6 +242,7 @@ export const paymentIPN: RequestHandler = async (req: Request, res: Response, ne
         const storePass = req.body.store_passwd;
 
         if (storeId !== config.sslCommerze.storeId || storePass !== config.sslCommerze.storePassword) {
+            console.log("Unauthorized IPN request");
             res.status(401).json({ error: "Unauthorized IPN request" });
             return
         }
