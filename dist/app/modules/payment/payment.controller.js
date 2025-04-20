@@ -156,6 +156,7 @@ const createOrderAndInitiatePayment = (req, res, next) => __awaiter(void 0, void
         });
         yield order_model_1.default.validate({ user, items: JSON.parse(items), totalPrice, paymentMethod, deliveryAddress: JSON.parse(deliveryAddress) });
         let prescription = null;
+        console.log("Prescription:", req.file);
         if (req.file) {
             prescription = yield (0, cloudinary_1.uploadImage)(req.file);
         }
@@ -204,7 +205,7 @@ const paymentIPN = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         console.log("IPN Request Body:", req.body);
         const storeId = req.body.store_id;
         const storePass = req.body.store_passwd;
-        if (storeId !== process.env.SSLCOMMERZ_STORE_ID || storePass !== process.env.SSLCOMMERZ_STORE_PASSWORD) {
+        if (storeId !== config_1.default.sslCommerze.storeId || storePass !== config_1.default.sslCommerze.storePassword) {
             res.status(401).json({ error: "Unauthorized IPN request" });
             return;
         }
@@ -225,7 +226,7 @@ const paymentIPN = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 return;
             }
             order.paymentStatus = 'paid';
-            order.status = 'confirmed';
+            order.paymentMethod = req.body.card_issuer;
             order.paymentDetails = req.body;
             yield order.save();
             res.status(200).json({ success: true, message: "IPN processed successfully" });

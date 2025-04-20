@@ -1,5 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const config_1 = __importDefault(require("../config"));
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const errorHandler = (err, req, res, next) => {
     let statusCode = err.statusCode || 500;
@@ -24,7 +28,7 @@ const errorHandler = (err, req, res, next) => {
             name: err.name || 'UnknownError',
             errors: errors,
         } : undefined,
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+        stack: config_1.default.environment === 'development' ? err.stack : undefined,
     };
     console.error(errorResponse);
     res.status(statusCode).json(errorResponse);

@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import config from '../config';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +26,7 @@ const errorHandler = (err: any, req: Request, res: Response, next: NextFunction)
       name: err.name || 'UnknownError',
       errors: errors,
     } : undefined,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    stack: config.environment === 'development' ? err.stack : undefined,
   };
 
   console.error(errorResponse);

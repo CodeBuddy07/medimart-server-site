@@ -179,6 +179,9 @@ export const createOrderAndInitiatePayment = async (req: CustomRequest, res: Res
         await orderModel.validate({ user, items: JSON.parse(items), totalPrice, paymentMethod, deliveryAddress: JSON.parse(deliveryAddress) })
 
         let prescription = null;
+
+        console.log("Prescription:",req.file);
+
         if (req.file) {
             prescription = await uploadImage(req.file);
         }
@@ -238,7 +241,7 @@ export const paymentIPN: RequestHandler = async (req: Request, res: Response, ne
         const storeId = req.body.store_id;
         const storePass = req.body.store_passwd;
 
-        if (storeId !== process.env.SSLCOMMERZ_STORE_ID || storePass !== process.env.SSLCOMMERZ_STORE_PASSWORD) {
+        if (storeId !== config.sslCommerze.storeId || storePass !== config.sslCommerze.storePassword) {
             res.status(401).json({ error: "Unauthorized IPN request" });
             return
         }
@@ -264,7 +267,7 @@ export const paymentIPN: RequestHandler = async (req: Request, res: Response, ne
             }
 
             order.paymentStatus = 'paid';
-            order.status = 'confirmed';
+            order.paymentMethod = req.body.card_issuer;
             order.paymentDetails = req.body;
             await order.save();
 

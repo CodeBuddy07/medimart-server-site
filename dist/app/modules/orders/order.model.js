@@ -102,7 +102,6 @@ const OrderSchema = new mongoose_1.Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ["COD", "Credit Card", "Debit Card", "UPI", "PayPal", "online"],
         required: [true, "Payment method is required"],
     },
     deliveryAddress: {

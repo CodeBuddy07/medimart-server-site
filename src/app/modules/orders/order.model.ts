@@ -14,7 +14,7 @@ interface IOrder {
     totalPrice: number;
     status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
     paymentStatus: "pending" | "paid" | "failed";
-    paymentMethod: "COD" | "Credit Card" | "Debit Card" | "UPI" | "PayPal"| "online";
+    paymentMethod: string;
     deliveryAddress: {
         street: string;
         city: string;
@@ -88,7 +88,6 @@ const OrderSchema: Schema = new Schema(
         },
         paymentMethod: {
             type: String,
-            enum: ["COD", "Credit Card", "Debit Card", "UPI", "PayPal", "online"],
             required: [true, "Payment method is required"],
         },
         deliveryAddress: {
