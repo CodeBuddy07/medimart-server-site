@@ -204,8 +204,7 @@ const paymentIPN = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const { tran_id, val_id, status, amount, store_amount } = req.body;
         console.log("IPN Request Body:", req.body);
         const storeId = req.body.store_id;
-        const storePass = req.body.store_passwd;
-        if (storeId !== config_1.default.sslCommerze.storeId || storePass !== config_1.default.sslCommerze.storePassword) {
+        if (storeId !== config_1.default.sslCommerze.storeId) {
             console.log("Unauthorized IPN request");
             res.status(401).json({ error: "Unauthorized IPN request" });
             return;

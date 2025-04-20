@@ -239,9 +239,8 @@ export const paymentIPN: RequestHandler = async (req: Request, res: Response, ne
 
   
         const storeId = req.body.store_id;
-        const storePass = req.body.store_passwd;
 
-        if (storeId !== config.sslCommerze.storeId || storePass !== config.sslCommerze.storePassword) {
+        if (storeId !== config.sslCommerze.storeId) {
             console.log("Unauthorized IPN request");
             res.status(401).json({ error: "Unauthorized IPN request" });
             return
